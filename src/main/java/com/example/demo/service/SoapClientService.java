@@ -1,11 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.wsdl.GetExampleRequest;
+import com.example.demo.wsdl.GetExampleResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.ws.client.core.WebServiceTemplate;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.ws.soap.client.core.SoapActionCallback;
 
 @Service
-@Slf4j
 public class SoapClientService {
 
     private final WebServiceTemplate webServiceTemplate;
@@ -14,15 +15,13 @@ public class SoapClientService {
         this.webServiceTemplate = webServiceTemplate;
     }
 
-    public Object callSoapService(Object request) {
-        try {
-            log.info("Sending SOAP request: {}", request);
-            Object response = webServiceTemplate.marshalSendAndReceive(request);
-            log.info("Received SOAP response: {}", response);
-            return response;
-        } catch (Exception e) {
-            log.error("Error calling SOAP service: ", e);
-            throw new RuntimeException("Failed to call SOAP service", e);
-        }
+    public String getExample(String name) {
+        GetExampleRequest request = new GetExampleRequest();
+        request.setName(name);
+        
+        GetExampleResponse response = (GetExampleResponse) webServiceTemplate
+            .marshalSendAndReceive(request, new SoapActionCallback(""));
+                                 
+        return response.getResult();
     }
 } 
